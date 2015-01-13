@@ -104,7 +104,7 @@ class Bridge(object):
     :attr bool verified: Did we receive the descriptor for this bridge that
         was specified in the networkstatus?
     :attr str countryCode: The two-letter country code of this bridge as
-        reported by GeoIP. 
+        reported by GeoIP.
     """
     def __init__(self, nickname, ip, orport, fingerprint=None, id_digest=None,
                  or_addresses=None, transports=None):
