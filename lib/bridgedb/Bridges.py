@@ -21,6 +21,7 @@ import random
 
 import bridgedb.Storage
 import bridgedb.Bucket
+import bridgedb.geo
 
 from bridgedb.crypto import getHMACFunc
 from bridgedb.parse import addr
@@ -102,6 +103,8 @@ class Bridge(object):
         given in the bridge's descriptor, corresponding to desc_digest.
     :attr bool verified: Did we receive the descriptor for this bridge that
         was specified in the networkstatus?
+    :attr str countryCode: The two-letter country code of this bridge as
+        reported by GeoIP.
     """
     def __init__(self, nickname, ip, orport, fingerprint=None, id_digest=None,
                  or_addresses=None, transports=None):
@@ -119,6 +122,7 @@ class Bridge(object):
         self.desc_digest = None
         self.ei_digest = None
         self.verified = False
+        self.countryCode = None
 
         if id_digest is not None:
             assert fingerprint is None
@@ -132,6 +136,13 @@ class Bridge(object):
             self.fingerprint = fingerprint.lower()
         else:
             raise TypeError("Bridge with no ID")
+
+        # Determine the country code of this bridge.
+        self.countryCode = bridgedb.geo.getCountryCode(ip)
+        if self.countryCode is None:
+            logging.debug("  Bridge: Country code not detected. IP: %s" % ip)
+        else:
+            logging.debug("  Bridge: Country code found: %s" % self.countryCode)
 
     def setDescriptorDigest(self, digest):
         """Set the descriptor digest, specified in the NS."""
